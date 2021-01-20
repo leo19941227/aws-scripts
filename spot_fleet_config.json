@@ -1,0 +1,23 @@
+{
+    "TargetCapacity": 1,
+    "IamFleetRole": "arn:aws:iam::237978286771:role/aws-ec2-spot-fleet-tagging-role",
+    "LaunchSpecifications": [
+        {
+            "ImageId": "ami-09aed85ddf3e7c184",
+            "KeyName": "leo19941227",
+            "SecurityGroups": [
+                {
+                    "GroupId": "sg-03beee836a87a3015"
+                }
+            ],
+            "InstanceType": "instance_placeholder",
+            "Placement": {
+                "AvailabilityZone": "us-west-2a, us-west-2b, us-west-2c, us-west-2d"
+            },
+            "UserData": "base64_encoded_bash_script",
+            "IamInstanceProfile": {
+                "Arn": "arn:aws:iam::237978286771:instance-profile/leo-training"
+            }
+        }
+    ]
+}
