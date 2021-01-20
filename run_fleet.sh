@@ -1,23 +1,27 @@
 #!/bin/bash
 
-SCRIPT=$1
-MACHINE=$2
-
-if [ -z "$SCRIPT" ]; then
-    echo SCRIPT argument is empty
-    exit 1
-fi
+MACHINE=$1
+shift
+COMMANDS=$*
 
 if [ -z "$MACHINE" ]; then
     echo MACHINE argument is empty
     exit 1
 fi
 
+if [ -z "$COMMANDS" ]; then
+    echo COMMANDS argument is empty
+    exit 1
+fi
+
 cp ./spot_fleet_config.json ./tmp.json
-USER_DATA=$(base64 $SCRIPT -w0)
-sed -i "s|base64_encoded_bash_script|$USER_DATA|g" ./tmp.json
+cp ./user_data_script.sh ./tmp.sh
+
+sed -i "s|COMMAND_PLACEHOLDER|$COMMANDS|g" ./tmp.sh
+sed -i "s|base64_encoded_bash_script|$(base64 ./tmp.sh -w0)|g" ./tmp.json
 sed -i "s|instance_placeholder|$MACHINE|g" ./tmp.json
 
 aws ec2 request-spot-fleet --spot-fleet-request-config file://tmp.json
 
 rm ./tmp.json
+rm ./tmp.sh
