@@ -47,7 +47,8 @@ git config --global user.name \"leo19941227\"; \
 git config --global user.email \"leo19941227@gmail.com\"; \
 git pull origin master; \
 mkdir -p logs/; \
-COMMAND_PLACEHOLDER &> logs/\$(date '+%A_%W_%Y_%X').log; \
+COMMAND=\"COMMAND_PLACEHOLDER\"
+COMMAND_PLACEHOLDER &> \"logs/\"\${COMMAND// /_}\".log\"; \
 WAIT_BEFORE_TERMINATION=30; \
 sleep \$WAIT_BEFORE_TERMINATION; \
 AWS_REGION=\$(curl http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | awk -F\\\" '{print \$4}'); \
