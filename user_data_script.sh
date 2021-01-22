@@ -43,18 +43,15 @@ sudo -H -u ec2-user tmux new -ds $SESSION
 sudo -H -u ec2-user tmux send -t $SESSION "cd /mnt/efs/fs1/; \
 source ./miniconda3_amazon_linux2/bin/activate benchmark; \
 cd ./s3prl; \
-git config --global user.name \"leo19941227\"; \
-git config --global user.email \"leo19941227@gmail.com\"; \
-git checkout aws; \
-git pull origin aws; \
 mkdir -p logs/; \
 AWS_REGION=\$(curl http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | awk -F\\\" '{print \$4}'); \
 INSTANCE_ID=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id); \
 SPOT_FLEET_REQUEST_ID=\$(aws ec2 describe-spot-instance-requests --region \$AWS_REGION --filter \"Name=instance-id,Values=\$INSTANCE_ID\" --query \"SpotInstanceRequests[].Tags[?Key=='aws:ec2spot:fleet-request-id'].Value[]\" --output text); \
-LOGNAME=\$(date +%Y%m%d%H%M%S)\"_COMMAND_PLACEHOLDER\"; \
+LOGNAME=\"COMMAND_PLACEHOLDER\"; \
 TERMINATE_COMMAND=\"aws ec2 cancel-spot-fleet-requests --region \$AWS_REGION --spot-fleet-request-ids \$SPOT_FLEET_REQUEST_ID --terminate-instances\"; \
 echo \$TERMINATE_COMMAND > \"logs/\"\${LOGNAME// /_}\".terminate\"; \
 COMMAND_PLACEHOLDER 2> \"logs/\"\${LOGNAME// /_}\".log\"; \
+touch \"logs/\"\${LOGNAME// /_}\".done\"; \
 WAIT_BEFORE_TERMINATION=30; \
 sleep \$WAIT_BEFORE_TERMINATION; \
 eval \$TERMINATE_COMMAND" ENTER
