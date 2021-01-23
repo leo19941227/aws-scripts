@@ -57,13 +57,14 @@ source ${CONDA_ROOT}\"/bin/activate\" benchmark; \
 LOGNAME=\"COMMAND_PLACEHOLDER\"; \
 LOGDIR=${efs_mount_point_1}\"/logs/\"\${LOGNAME// /_}; \
 mkdir -p \$LOGDIR; \
-echo \"ssh -i /home/leo/.ssh/leo19941227.pem ${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4)\" > \$LOGDIR\"/ssh\"; \
+echo \"${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4)\" > \$LOGDIR\"/ssh\"; \
 cd WORKDIR_PLACEHOLDER; \
 AWS_REGION=\$(curl http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | awk -F\\\" '{print \$4}'); \
 INSTANCE_ID=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id); \
 SPOT_FLEET_REQUEST_ID=\$(aws ec2 describe-spot-instance-requests --region \$AWS_REGION --filter \"Name=instance-id,Values=\$INSTANCE_ID\" --query \"SpotInstanceRequests[].Tags[?Key=='aws:ec2spot:fleet-request-id'].Value[]\" --output text); \
 TERMINATE_COMMAND=\"aws ec2 cancel-spot-fleet-requests --region \$AWS_REGION --spot-fleet-request-ids \$SPOT_FLEET_REQUEST_ID --terminate-instances\"; \
-COMMAND_PLACEHOLDER 2> \$LOGDIR\"/log\"; \
+COMMAND_PLACEHOLDER; \
+touch \$LOGDIR\"/done\"; \
 WAIT_BEFORE_TERMINATION=10; \
 sleep \$WAIT_BEFORE_TERMINATION; \
 eval \$TERMINATE_COMMAND" ENTER

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SSH_PROFILE=/home/leo/.ssh/leo19941227.pem
+
 OS=$1
 shift
 MACHINE=$1
@@ -7,6 +9,14 @@ shift
 WORKDIR=$1
 shift
 COMMAND=$*
+
+LOGDIR="./logs/"${COMMAND// /_}
+mkdir -p $LOGDIR
+if [ -f $LOGDIR"/done" ]; then
+    echo done file exists. exit.
+    exit 1
+fi
+rm -rf $LOGDIR"/*"
 
 if [ $(df "logs" | grep "aws" | wc -l) == "0" ]; then
     echo logs/ is not mounted from AWS EFS.
@@ -62,10 +72,20 @@ rm ./tmp.sh
 
 TERMINATE_COMMAND="aws ec2 cancel-spot-fleet-requests --region us-west-2 --spot-fleet-request-ids $FLEETID --terminate-instances"
 
-LOGDIR="./logs/"${COMMAND// /_}
-mkdir -p $LOGDIR
 touch $LOGDIR"/command" $LOGDIR"/terminate"
 echo $COMMAND > $LOGDIR"/command"
 echo $TERMINATE_COMMAND > $LOGDIR"/terminate"
-watch -n 0.5 -c "cat $LOGDIR\"/log\" | tail -n 5"
+
+while :
+do
+    if [ -f $LOGDIR"/ssh" ]; then
+        break
+    fi
+    echo ssh profile not found. retry after 10 secs.
+    sleep 10
+done
+
+ssh -o "StrictHostKeyChecking no" -t -i $SSH_PROFILE $(cat $LOGDIR"/ssh") "tmux a"
+eval $TERMINATE_COMMAND
+rm $LOGDIR"/ssh"
 
