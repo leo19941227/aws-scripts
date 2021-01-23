@@ -24,12 +24,16 @@ if [ -z "$OS" ]; then
     exit 1
 fi
 
+efs_mount_point_1=/mnt/efs/fs1/
 if [ "$OS" == "amazon_linux2" ]; then
     IMAGE="ami-09aed85ddf3e7c184"
+    CONDA_ROOT=$efs_mount_point_1"/miniconda3_amazon_linux2/"
+    NONROOT_USER="ec2-user"
 
 elif [ "$OS" == "ubuntu18" ]; then
     IMAGE="ami-0b1a80ce62c464a55"
-
+    CONDA_ROOT=$efs_mount_point_1"/miniconda3_ubuntu18/"
+    NONROOT_USER="ubuntu"
 fi
 
 if [ -z "$IMAGE" ]; then
@@ -55,7 +59,6 @@ fi
 cp ./user_data_script.sh ./tmp.sh
 cp ./spot_fleet_config.json ./tmp.json
 
-sed -i "s|WORKDIR_PLACEHOLDER|$WORKDIR|g" ./tmp.sh
 sed -i "s|COMMAND_PLACEHOLDER|$COMMAND|g" ./tmp.sh
 sed -i "s|SCRIPT_PLACEHOLDER|$(base64 ./tmp.sh -w0)|g" ./tmp.json
 sed -i "s|MACHINE_PLACEHOLDER|$MACHINE|g" ./tmp.json
@@ -87,7 +90,13 @@ done
 if [ -z "$CONNECTED" ]; then
     echo cancel the spot fleet request.
 else
-    ssh -o "StrictHostKeyChecking no" -t -i $SSH_PROFILE $(cat $LOGDIR"/ssh") "tmux a"
+    echo execute the command.
+    ssh -o "StrictHostKeyChecking no" -t -i $SSH_PROFILE $(cat $LOGDIR"/ssh") " \
+        source ${CONDA_ROOT}/bin/activate benchmark; \
+        cd ${efs_mount_point_1}/${WORKDIR}; \
+        ${COMMAND}; \
+        ${TERMINATE_COMMAND}; \
+    "
 fi
 
 eval $TERMINATE_COMMAND

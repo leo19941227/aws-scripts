@@ -47,27 +47,8 @@ while true; do
     sleep $waitTime
 done
 
-AWS_REGION=$(curl http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}')
-INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
-while true; do
-    SPOT_FLEET_REQUEST_ID=$(aws ec2 describe-spot-instance-requests --region $AWS_REGION \
-        --filter "Name=instance-id,Values='$INSTANCE_ID'" \
-        --query "SpotInstanceRequests[].Tags[?Key=='aws:ec2spot:fleet-request-id'].Value[]" \
-        --output text)
-    if [ ! -z $SPOT_FLEET_REQUEST_ID ]; then
-        break
-    fi
-done
 LOGNAME="COMMAND_PLACEHOLDER"
 LOGDIR=${efs_mount_point_1}"/logs/"${LOGNAME// /_}
-SESSION=work
+mkdir -p ${LOGDIR}
+echo ${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4) > ${LOGDIR}/ssh
 
-sudo -H -u $NONROOT_USER tmux new -ds $SESSION
-sudo -H -u $NONROOT_USER tmux send -t $SESSION " \
-echo spot_fleet_request_id=${SPOT_FLEET_REQUEST_ID}; \
-source ${CONDA_ROOT}/bin/activate benchmark; \
-mkdir -p ${LOGDIR}; \
-echo ${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4) > ${LOGDIR}/ssh; \
-cd ${efs_mount_point_1}/WORKDIR_PLACEHOLDER; \
-COMMAND_PLACEHOLDER; \
-aws ec2 cancel-spot-fleet-requests --region ${AWS_REGION} --spot-fleet-request-ids ${SPOT_FLEET_REQUEST_ID} --terminate-instances" ENTER
