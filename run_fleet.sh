@@ -6,8 +6,8 @@ WORKDIR=$1
 shift
 COMMAND=$*
 
-if [ ! -L "logs" ]; then
-    echo Please set up logging dir: logs/
+if [ $(df "logs" | grep "aws" | wc -l) == "0" ]; then
+    echo logs/ is not mounted from AWS EFS.
     exit 1
 fi
 
