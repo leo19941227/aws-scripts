@@ -10,11 +10,11 @@
                     "GroupId": "sg-03beee836a87a3015"
                 }
             ],
-            "InstanceType": "instance_placeholder",
+            "InstanceType": "MACHINE_PLACEHOLDER",
             "Placement": {
                 "AvailabilityZone": "us-west-2a, us-west-2b, us-west-2c, us-west-2d"
             },
-            "UserData": "base64_encoded_bash_script",
+            "UserData": "SCRIPT_PLACEHOLDER",
             "IamInstanceProfile": {
                 "Arn": "arn:aws:iam::237978286771:instance-profile/leo-training"
             }
