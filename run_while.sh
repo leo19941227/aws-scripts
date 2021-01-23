@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while :
+for i in $(seq 1 100);
 do
     eval $*
 done
