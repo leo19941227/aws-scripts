@@ -38,12 +38,18 @@ done
 WAIT_BEFORE_EXECUTION=10
 sleep $WAIT_BEFORE_EXECUTION
 
+if [ $(cat /etc/os-release | head -n 1) == "NAME=\"Ubuntu\"" ]; then
+    CONDA_ROOT=$efs_mount_point_1"miniconda3_ubuntu18/"
+
+elif [ $(cat /etc/os-release | head -n 1) == "NAME=\"Amazon Linux\"" ]; then
+    CONDA_ROOT=$efs_mount_point_1"miniconda3_amazon_linux2/"
+
 SESSION=work
 sudo -H -u ec2-user tmux new -ds $SESSION
-sudo -H -u ec2-user tmux send -t $SESSION "cd /mnt/efs/fs1/; \
-source ./miniconda3_amazon_linux2/bin/activate benchmark; \
+sudo -H -u ec2-user tmux send -t $SESSION "cd \$efs_mount_point_1; \
+source \$CONDA_ROOT\"/bin/activate\" benchmark; \
 LOGNAME=\"COMMAND_PLACEHOLDER\"; \
-LOGDIR=\"/mnt/efs/fs1/logs/\"\${LOGNAME// /_}; \
+LOGDIR=\$efs_mount_point_1\"/logs/\"\${LOGNAME// /_}; \
 mkdir -p \$LOGDIR; \
 cd WORKDIR_PLACEHOLDER; \
 AWS_REGION=\$(curl http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | awk -F\\\" '{print \$4}'); \
