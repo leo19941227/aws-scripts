@@ -64,6 +64,7 @@ SESSION=work
 
 sudo -H -u $NONROOT_USER tmux new -ds $SESSION
 sudo -H -u $NONROOT_USER tmux send -t $SESSION " \
+echo spot_fleet_request_id=${SPOT_FLEET_REQUEST_ID}; \
 source ${CONDA_ROOT}/bin/activate benchmark; \
 mkdir -p ${LOGDIR}; \
 echo ${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4) > ${LOGDIR}/ssh; \

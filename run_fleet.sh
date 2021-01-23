@@ -72,16 +72,24 @@ touch $LOGDIR"/command" $LOGDIR"/terminate"
 echo $COMMAND > $LOGDIR"/command"
 echo $TERMINATE_COMMAND > $LOGDIR"/terminate"
 
-while :
+# wait for 10 mins
+for i in $(seq 1 60);
 do
     if [ -f $LOGDIR"/ssh" ]; then
+        echo ssh profile found. connected.
+        CONNECTED=ok
         break
     fi
     echo ssh profile not found. retry after 10 secs.
     sleep 10
 done
 
-ssh -o "StrictHostKeyChecking no" -t -i $SSH_PROFILE $(cat $LOGDIR"/ssh") "tmux a"
+if [ -z "$CONNECTED" ]; then
+    echo cancel the spot fleet request.
+else
+    ssh -o "StrictHostKeyChecking no" -t -i $SSH_PROFILE $(cat $LOGDIR"/ssh") "tmux a"
+fi
+
 eval $TERMINATE_COMMAND
 rm $LOGDIR"/ssh"
 
