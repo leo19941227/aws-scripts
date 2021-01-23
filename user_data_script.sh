@@ -69,5 +69,4 @@ mkdir -p ${LOGDIR}; \
 echo ${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4) > ${LOGDIR}/ssh; \
 cd ${efs_mount_point_1}/WORKDIR_PLACEHOLDER; \
 COMMAND_PLACEHOLDER; \
-touch ${LOGDIR}/done; \
 aws ec2 cancel-spot-fleet-requests --region ${AWS_REGION} --spot-fleet-request-ids ${SPOT_FLEET_REQUEST_ID} --terminate-instances" ENTER

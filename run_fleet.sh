@@ -12,10 +12,6 @@ COMMAND=$*
 
 LOGDIR="./logs/"${COMMAND// /_}
 mkdir -p $LOGDIR
-if [ -f $LOGDIR"/done" ]; then
-    echo done file exists. exit.
-    exit 1
-fi
 rm -rf $LOGDIR"/*"
 
 if [ $(df "logs" | grep "aws" | wc -l) == "0" ]; then
