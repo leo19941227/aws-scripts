@@ -43,6 +43,7 @@ TERMINATE_COMMAND="aws ec2 cancel-spot-fleet-requests --region us-west-2 --spot-
 
 LOGDIR="./logs/"${COMMAND// /_}
 mkdir -p $LOGDIR
+touch $LOGDIR"/command" $LOGDIR"/terminate"
 echo $COMMAND > $LOGDIR"/command"
 echo $TERMINATE_COMMAND > $LOGDIR"/terminate"
 watch -n 0.5 -c cat $LOGDIR"/log"
