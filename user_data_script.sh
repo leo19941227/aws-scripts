@@ -63,8 +63,6 @@ INSTANCE_ID=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id); \
 SPOT_FLEET_REQUEST_ID=\$(aws ec2 describe-spot-instance-requests --region \$AWS_REGION --filter \"Name=instance-id,Values=\$INSTANCE_ID\" --query \"SpotInstanceRequests[].Tags[?Key=='aws:ec2spot:fleet-request-id'].Value[]\" --output text); \
 TERMINATE_COMMAND=\"aws ec2 cancel-spot-fleet-requests --region \$AWS_REGION --spot-fleet-request-ids \$SPOT_FLEET_REQUEST_ID --terminate-instances\"; \
 COMMAND_PLACEHOLDER 2> \$LOGDIR\"/log\"; \
-if [ \"\$(echo \$?)\" == \"1\" ]; then STATUS=fail; else STATUS=success; fi; \
-touch \$LOGDIR\"/\"\$STATUS; \
 WAIT_BEFORE_TERMINATION=10; \
 sleep \$WAIT_BEFORE_TERMINATION; \
 eval \$TERMINATE_COMMAND" ENTER
