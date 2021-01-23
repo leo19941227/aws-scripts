@@ -57,6 +57,7 @@ source ${CONDA_ROOT}\"/bin/activate\" benchmark; \
 LOGNAME=\"COMMAND_PLACEHOLDER\"; \
 LOGDIR=${efs_mount_point_1}\"/logs/\"\${LOGNAME// /_}; \
 mkdir -p \$LOGDIR; \
+echo \"ssh -i /home/leo/.ssh/leo19941227.pem ${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4)\" > \$LOGDIR\"/ssh\"; \
 cd WORKDIR_PLACEHOLDER; \
 AWS_REGION=\$(curl http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | awk -F\\\" '{print \$4}'); \
 INSTANCE_ID=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id); \
