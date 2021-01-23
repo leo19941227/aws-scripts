@@ -3,7 +3,7 @@
     "IamFleetRole": "arn:aws:iam::237978286771:role/aws-ec2-spot-fleet-tagging-role",
     "LaunchSpecifications": [
         {
-            "ImageId": "ami-09aed85ddf3e7c184",
+            "ImageId": "IMAGE_PLACEHOLDER",
             "KeyName": "leo19941227",
             "SecurityGroups": [
                 {
