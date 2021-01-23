@@ -12,6 +12,8 @@ if [ "$(cat /etc/os-release | head -n 1)" == "NAME=\"Amazon Linux\"" ]; then
     yum install -y nfs-utils
 
     CONDA_ROOT=$efs_mount_point_1"/miniconda3_amazon_linux2/"
+    NONROOT_USER="ec2-user"
+
 elif [ "$(cat /etc/os-release | head -n 1)" == "NAME=\"Ubuntu\"" ]; then
     sudo apt-get -y update
     sudo apt-get -y upgrade
@@ -25,6 +27,7 @@ elif [ "$(cat /etc/os-release | head -n 1)" == "NAME=\"Ubuntu\"" ]; then
     cd ../
 
     CONDA_ROOT=$efs_mount_point_1"/miniconda3_ubuntu18/"
+    NONROOT_USER="ubuntu"
 fi
 
 # mount efs
@@ -48,8 +51,8 @@ WAIT_BEFORE_EXECUTION=10
 sleep $WAIT_BEFORE_EXECUTION
 
 SESSION=work
-sudo -H -u ec2-user tmux new -ds $SESSION
-sudo -H -u ec2-user tmux send -t $SESSION "cd ${efs_mount_point_1}; \
+sudo -H -u $NONROOT_USER tmux new -ds $SESSION
+sudo -H -u $NONROOT_USER tmux send -t $SESSION "cd ${efs_mount_point_1}; \
 source ${CONDA_ROOT}\"/bin/activate\" benchmark; \
 LOGNAME=\"COMMAND_PLACEHOLDER\"; \
 LOGDIR=${efs_mount_point_1}\"/logs/\"\${LOGNAME// /_}; \
