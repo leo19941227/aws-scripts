@@ -16,12 +16,12 @@ rm -rf $LOGDIR"/*"
 
 if [ $(df "logs" | grep "aws" | wc -l) == "0" ]; then
     echo logs/ is not mounted from AWS EFS.
-    exit 1
+    return 1
 fi
 
 if [ -z "$OS" ]; then
     echo OS argument is empty
-    exit 1
+    return 1
 fi
 
 efs_mount_point_1=/mnt/efs/fs1/
@@ -38,40 +38,42 @@ fi
 
 if [ -z "$IMAGE" ]; then
     echo Unsupported OS argument
-    exit 1
+    return 1
 fi
 
 if [ -z "$MACHINE" ]; then
     echo MACHINE argument is empty
-    exit 1
+    return 1
 fi
 
 if [ -z "$WORKDIR" ]; then
     echo WORKDIR argument is empty
-    exit 1
+    return 1
 fi
 
 if [ -z "$COMMAND" ]; then
     echo COMMAND argument is empty
-    exit 1
+    return 1
 fi
 
-cp ./user_data_script.sh ./tmp.sh
-cp ./spot_fleet_config.json ./tmp.json
+tmp_sh=$(mktemp)
+tmp_json=$(mktemp)
+cp ./user_data_script.sh $tmp_sh
+cp ./spot_fleet_config.json $tmp_json
 
-sed -i "s|COMMAND_PLACEHOLDER|$COMMAND|g" ./tmp.sh
-sed -i "s|SCRIPT_PLACEHOLDER|$(base64 ./tmp.sh -w0)|g" ./tmp.json
-sed -i "s|MACHINE_PLACEHOLDER|$MACHINE|g" ./tmp.json
-sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" ./tmp.json
+sed -i "s|COMMAND_PLACEHOLDER|$COMMAND|g" $tmp_sh
+sed -i "s|SCRIPT_PLACEHOLDER|$(base64 ${tmp_sh} -w0)|g" $tmp_json
+sed -i "s|MACHINE_PLACEHOLDER|$MACHINE|g" $tmp_json
+sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" $tmp_json
 
-FLEETID=$(aws ec2 request-spot-fleet --spot-fleet-request-config file://tmp.json --query \"SpotFleetRequestId\")
+FLEETID=$(aws ec2 request-spot-fleet --spot-fleet-request-config file://${tmp_json} --query \"SpotFleetRequestId\")
 
-rm ./tmp.json
-rm ./tmp.sh
+rm $tmp_sh
+rm $tmp_json
 
 if [ -z $FLEETID ]; then
     echo no returned fleetid. exit.
-    exit 1
+    return 1
 fi
 
 TERMINATE_COMMAND="aws ec2 cancel-spot-fleet-requests --region us-west-2 --spot-fleet-request-ids $FLEETID --terminate-instances"
