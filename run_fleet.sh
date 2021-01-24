@@ -69,6 +69,11 @@ FLEETID=$(aws ec2 request-spot-fleet --spot-fleet-request-config file://tmp.json
 rm ./tmp.json
 rm ./tmp.sh
 
+if [ -z $FLEETID ]; then
+    echo no returned fleetid. exit.
+    exit 1
+fi
+
 TERMINATE_COMMAND="aws ec2 cancel-spot-fleet-requests --region us-west-2 --spot-fleet-request-ids $FLEETID --terminate-instances"
 
 touch $LOGDIR"/command" $LOGDIR"/terminate"
