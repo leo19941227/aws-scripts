@@ -51,6 +51,8 @@ SESSION=launch
 sudo -H -u $NONROOT_USER tmux new -ds $SESSION
 sudo -H -u $NONROOT_USER tmux send -t $SESSION " \
 cd \$HOME; \
+git config --global user.name \"Leo Yang\"; \
+git config --global user.email \"leo19941227@gmail.com\"; \
 git clone https://github.com/leo19941227/env.git; \
 mv .bashrc .bashrc.backup; \
 ln -s env/bashrc .bashrc; \
