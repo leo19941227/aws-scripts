@@ -47,8 +47,11 @@ while true; do
     sleep $waitTime
 done
 
-LOGNAME="COMMAND_PLACEHOLDER"
-LOGDIR=${efs_mount_point_1}"/logs/"${LOGNAME// /_}
-mkdir -p ${LOGDIR}
-echo ${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4) > ${LOGDIR}/ssh
-
+SESSION=launch
+sudo -H -u $NONROOT_USER tmux new -ds $SESSION
+sudo -H -u $NONROOT_USER tmux send -t $SESSION " \
+cd ${efs_mount_point_1}; \
+LOGNAME=\"COMMAND_PLACEHOLDER\"; \
+LOGDIR=${efs_mount_point_1}\"/logs/\"\${LOGNAME// /_}; \
+mkdir -p \${LOGDIR}; \
+echo ${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4) > \${LOGDIR}/ssh" ENTER

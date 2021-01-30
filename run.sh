@@ -2,6 +2,8 @@
 
 SSH_PROFILE=/home/leo/.ssh/leo19941227.pem
 
+SPOT=$1
+shift
 OS=$1
 shift
 MACHINE=$1
@@ -16,6 +18,11 @@ rm -rf $LOGDIR"/*"
 
 if [ $(df "logs" | grep "aws" | wc -l) == "0" ]; then
     echo logs/ is not mounted from AWS EFS.
+    return 1
+fi
+
+if [ -z "$SPOT" ]; then
+    echo SPOT argument is empty
     return 1
 fi
 
@@ -56,27 +63,11 @@ if [ -z "$COMMAND" ]; then
     return 1
 fi
 
-tmp_sh=$(mktemp)
-tmp_json=$(mktemp)
-cp ./user_data_script.sh $tmp_sh
-cp ./spot_fleet_config.json $tmp_json
-
-sed -i "s|COMMAND_PLACEHOLDER|$COMMAND|g" $tmp_sh
-sed -i "s|SCRIPT_PLACEHOLDER|$(base64 ${tmp_sh} -w0)|g" $tmp_json
-sed -i "s|MACHINE_PLACEHOLDER|$MACHINE|g" $tmp_json
-sed -i "s|IMAGE_PLACEHOLDER|$IMAGE|g" $tmp_json
-
-FLEETID=$(aws ec2 request-spot-fleet --spot-fleet-request-config file://${tmp_json} --query \"SpotFleetRequestId\")
-
-rm $tmp_sh
-rm $tmp_json
-
-if [ -z $FLEETID ]; then
-    echo no returned fleetid. exit.
-    return 1
+if [ $SPOT == "1" ]; then
+    source ./run_spot.sh
+else
+    source ./run_demand.sh
 fi
-
-TERMINATE_COMMAND="aws ec2 cancel-spot-fleet-requests --region us-west-2 --spot-fleet-request-ids $FLEETID --terminate-instances"
 
 touch $LOGDIR"/command" $LOGDIR"/terminate"
 echo $COMMAND > $LOGDIR"/command"
@@ -95,7 +86,7 @@ do
 done
 
 if [ -z "$CONNECTED" ]; then
-    echo cancel the spot fleet request.
+    echo cancel the request.
 else
     echo execute the command.
     ssh -o "StrictHostKeyChecking no" -t -i $SSH_PROFILE $(cat $LOGDIR"/ssh") " \
@@ -108,4 +99,3 @@ fi
 
 eval $TERMINATE_COMMAND
 rm $LOGDIR"/ssh"
-
