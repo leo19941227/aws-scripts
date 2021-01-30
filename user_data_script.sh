@@ -50,6 +50,17 @@ done
 SESSION=launch
 sudo -H -u $NONROOT_USER tmux new -ds $SESSION
 sudo -H -u $NONROOT_USER tmux send -t $SESSION " \
+cd \$HOME; \
+git clone https://github.com/leo19941227/env.git; \
+mv .bashrc .bashrc.backup; \
+ln -s env/bashrc .bashrc; \
+mv .vimrc .vimrc.backup; \
+ln -s env/vimrc .vimrc; \
+mv .tmux.conf .tmux.conf.backup; \
+ln -s env/tmux.conf .tmux.conf; \
+bash env/vundle.sh; \
+bash env/tpm.sh; \
+tmux source-file \${HOME}/.tmux.conf; \
 cd ${efs_mount_point_1}; \
 LOGNAME=\"COMMAND_PLACEHOLDER\"; \
 LOGDIR=${efs_mount_point_1}\"/logs/\"\${LOGNAME// /_}; \
