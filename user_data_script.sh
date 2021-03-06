@@ -64,7 +64,6 @@ bash env/vundle.sh; \
 bash env/tpm.sh; \
 tmux source-file \${HOME}/.tmux.conf; \
 cd ${efs_mount_point_1}; \
-LOGNAME=\"COMMAND_PLACEHOLDER\"; \
-LOGDIR=${efs_mount_point_1}\"/logs/\"\${LOGNAME// /_}; \
+LOGDIR=${efs_mount_point_1}\"/logs/\"\$(echo \"COMMAND_PLACEHOLDER\" | sha256sum | cut -d\" \" -f1); \
 mkdir -p \${LOGDIR}; \
 echo ${NONROOT_USER}@$(curl http://169.254.169.254/latest/meta-data/public-ipv4) > \${LOGDIR}/ssh" ENTER

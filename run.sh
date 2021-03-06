@@ -12,7 +12,7 @@ WORKDIR=$1
 shift
 COMMAND=$*
 
-LOGDIR="./logs/"${COMMAND// /_}
+LOGDIR="./logs/"$(echo "$COMMAND" | sha256sum | cut -d" " -f1)
 mkdir -p $LOGDIR
 rm -rf $LOGDIR"/*"
 
