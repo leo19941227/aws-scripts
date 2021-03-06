@@ -1,4 +1,9 @@
 logs
 s3prl
 datasets
+*.log
+*.ckpt
+*events*
+*.yaml
+command*
 
