@@ -26,6 +26,8 @@ elif [ "$(cat /etc/os-release | head -n 1)" == "NAME=\"Ubuntu\"" ]; then
     sudo apt install -y ./build/$(ls ./build | grep amazon-efs-utils)
     cd ../
 
+    sudo apt install -y sox
+
     CONDA_ROOT=$efs_mount_point_1"/miniconda3_ubuntu18/"
     NONROOT_USER="ubuntu"
 fi
